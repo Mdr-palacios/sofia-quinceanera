@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { BudgetItem, InsertBudgetItem } from "@shared/schema";
-import { Plus, Trash2, CheckCircle2, Circle } from "lucide-react";
+import { Plus, Trash2, CheckCircle2, Circle, Pencil, X, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
@@ -32,6 +32,15 @@ export default function Budget() {
       setShowForm(false);
       setForm({ category:"other", estimatedCost:0, actualCost:0, paid:false });
       toast({ title: "Expense added 💰" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<InsertBudgetItem> }) =>
+      apiRequest("PATCH", `/api/budget/${id}`, data).then(r => r.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/budget"] });
+      toast({ title: "Expense updated ✓" });
     },
   });
 
@@ -164,6 +173,11 @@ export default function Budget() {
               <input data-testid="input-budget-act" type="number" value={form.actualCost||0}
                 onChange={e=>setForm(f=>({...f,actualCost:Number(e.target.value)}))} style={inputStyle}/>
             </div>
+            <div>
+              <label style={labelStyle}>Vendor / Notes</label>
+              <input data-testid="input-budget-vendor" value={""} placeholder="Vendor name or notes..."
+                onChange={()=>{}} style={inputStyle}/>
+            </div>
           </div>
           <div style={{ display:"flex", gap:"var(--space-3)", marginTop:"var(--space-5)" }}>
             <button data-testid="button-submit-budget" onClick={()=>{
@@ -208,38 +222,158 @@ export default function Budget() {
                 </div>
               </div>
               {cat.items.map(item => (
-                <div key={item.id} data-testid={`row-budget-${item.id}`} style={{
-                  display:"flex", alignItems:"center", gap:"var(--space-3)",
-                  padding:"var(--space-4) var(--space-5)", borderBottom:"1px solid var(--color-border)",
-                }}>
-                  <button data-testid={`button-toggle-paid-${item.id}`}
-                    onClick={()=>togglePaidMutation.mutate({id:item.id,paid:!item.paid})}
-                    style={{ color: item.paid ? "hsl(142,50%,40%)" : "var(--color-text-faint)", flexShrink:0 }}>
-                    {item.paid ? <CheckCircle2 size={20}/> : <Circle size={20}/>}
-                  </button>
-                  <div style={{ flex:1 }}>
-                    <div style={{ fontSize:"var(--text-sm)", fontWeight:500, textDecoration: item.paid ? "line-through" : "none", color: item.paid ? "var(--color-text-muted)" : "var(--color-text)" }}>
-                      {item.description}
-                    </div>
-                  </div>
-                  <div style={{ textAlign:"right", flexShrink:0 }}>
-                    <div style={{ fontSize:"var(--text-sm)", fontWeight:600 }}>${item.estimatedCost.toLocaleString()}</div>
-                    {item.actualCost > 0 && <div style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>actual: ${item.actualCost.toLocaleString()}</div>}
-                  </div>
-                  {item.paid && (
-                    <span style={{ fontSize:"var(--text-xs)", padding:"2px 8px", borderRadius:"var(--radius-full)", background:"hsl(142,40%,90%)", color:"hsl(142,30%,30%)", fontWeight:600, flexShrink:0 }}>
-                      Paid
-                    </span>
-                  )}
-                  <button data-testid={`button-delete-budget-${item.id}`} onClick={()=>deleteMutation.mutate(item.id)} style={{ color:"var(--color-text-faint)", opacity:0.5, flexShrink:0 }}>
-                    <Trash2 size={14}/>
-                  </button>
-                </div>
+                <BudgetRow
+                  key={item.id}
+                  item={item}
+                  onTogglePaid={() => togglePaidMutation.mutate({id:item.id, paid:!item.paid})}
+                  onDelete={() => deleteMutation.mutate(item.id)}
+                  onSave={(data) => updateMutation.mutate({ id: item.id, data })}
+                />
               ))}
             </div>
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function BudgetRow({ item, onTogglePaid, onDelete, onSave }: {
+  item: BudgetItem;
+  onTogglePaid: () => void;
+  onDelete: () => void;
+  onSave: (data: Partial<InsertBudgetItem>) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Partial<InsertBudgetItem>>({});
+
+  function startEdit() {
+    setDraft({
+      description: item.description,
+      category: item.category,
+      estimatedCost: item.estimatedCost,
+      actualCost: item.actualCost,
+    });
+    setEditing(true);
+  }
+
+  function saveEdit() {
+    onSave(draft);
+    setEditing(false);
+  }
+
+  if (editing) {
+    return (
+      <div
+        data-testid={`row-budget-${item.id}`}
+        style={{
+          padding:"var(--space-4) var(--space-5)",
+          borderBottom:"1px solid var(--color-border)",
+          background:"hsl(340,55%,98%)",
+        }}
+      >
+        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr", gap:"var(--space-3)", alignItems:"end" }}>
+          <div>
+            <label style={labelStyle}>Description</label>
+            <input
+              data-testid={`input-edit-desc-${item.id}`}
+              value={draft.description || ""}
+              onChange={e => setDraft(d => ({ ...d, description: e.target.value }))}
+              style={inputStyle}
+              autoFocus
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Estimated ($)</label>
+            <input
+              type="number"
+              value={draft.estimatedCost || 0}
+              onChange={e => setDraft(d => ({ ...d, estimatedCost: Number(e.target.value) }))}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Actual ($)</label>
+            <input
+              type="number"
+              value={draft.actualCost || 0}
+              onChange={e => setDraft(d => ({ ...d, actualCost: Number(e.target.value) }))}
+              style={inputStyle}
+            />
+          </div>
+        </div>
+        <div style={{ display:"flex", gap:"var(--space-2)", marginTop:"var(--space-3)" }}>
+          <button
+            data-testid={`button-save-budget-${item.id}`}
+            onClick={saveEdit}
+            style={{
+              display:"flex", alignItems:"center", gap:6,
+              padding:"var(--space-2) var(--space-4)", borderRadius:"var(--radius-md)",
+              background:"var(--color-primary)", color:"white", fontWeight:600, fontSize:"var(--text-xs)",
+            }}
+          >
+            <Check size={14}/> Save
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            style={{
+              display:"flex", alignItems:"center", gap:6,
+              padding:"var(--space-2) var(--space-4)", borderRadius:"var(--radius-md)",
+              background:"var(--color-surface-offset)", color:"var(--color-text-muted)",
+              fontWeight:600, fontSize:"var(--text-xs)", border:"1px solid var(--color-border)",
+            }}
+          >
+            <X size={14}/> Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      data-testid={`row-budget-${item.id}`}
+      style={{
+        display:"flex", alignItems:"center", gap:"var(--space-3)",
+        padding:"var(--space-4) var(--space-5)", borderBottom:"1px solid var(--color-border)",
+      }}
+    >
+      <button
+        data-testid={`button-toggle-paid-${item.id}`}
+        onClick={onTogglePaid}
+        style={{ color: item.paid ? "hsl(142,50%,40%)" : "var(--color-text-faint)", flexShrink:0 }}
+      >
+        {item.paid ? <CheckCircle2 size={20}/> : <Circle size={20}/>}
+      </button>
+      <div style={{ flex:1 }}>
+        <div style={{ fontSize:"var(--text-sm)", fontWeight:500, textDecoration: item.paid ? "line-through" : "none", color: item.paid ? "var(--color-text-muted)" : "var(--color-text)" }}>
+          {item.description}
+        </div>
+      </div>
+      <div style={{ textAlign:"right", flexShrink:0 }}>
+        <div style={{ fontSize:"var(--text-sm)", fontWeight:600 }}>${item.estimatedCost.toLocaleString()}</div>
+        {item.actualCost > 0 && <div style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>actual: ${item.actualCost.toLocaleString()}</div>}
+      </div>
+      {item.paid && (
+        <span style={{ fontSize:"var(--text-xs)", padding:"2px 8px", borderRadius:"var(--radius-full)", background:"hsl(142,40%,90%)", color:"hsl(142,30%,30%)", fontWeight:600, flexShrink:0 }}>
+          Paid
+        </span>
+      )}
+      <button
+        data-testid={`button-edit-budget-${item.id}`}
+        onClick={startEdit}
+        style={{ color:"var(--color-text-faint)", opacity:0.6, flexShrink:0, padding:4 }}
+        title="Edit expense"
+      >
+        <Pencil size={14}/>
+      </button>
+      <button
+        data-testid={`button-delete-budget-${item.id}`}
+        onClick={onDelete}
+        style={{ color:"var(--color-text-faint)", opacity:0.5, flexShrink:0 }}
+      >
+        <Trash2 size={14}/>
+      </button>
     </div>
   );
 }
@@ -251,5 +385,5 @@ const labelStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
   border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
-  fontSize:"var(--text-sm)",
+  fontSize:"var(--text-sm)", color:"var(--color-text)",
 };

@@ -2,18 +2,18 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Task, InsertTask } from "@shared/schema";
-import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, Plus, Trash2, Pencil, X, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
-  { key: "all", label: "All", emoji: "🌸" },
-  { key: "attire", label: "Attire", emoji: "👗" },
-  { key: "venue", label: "Venue", emoji: "🏛️" },
-  { key: "music", label: "Music", emoji: "🎵" },
-  { key: "catering", label: "Catering", emoji: "🍽️" },
-  { key: "decor", label: "Décor", emoji: "🌸" },
-  { key: "photo", label: "Photo/Video", emoji: "📸" },
-  { key: "other", label: "Other", emoji: "✨" },
+  { key: "all",      label: "All",        emoji: "🌸" },
+  { key: "attire",   label: "Attire",     emoji: "👗" },
+  { key: "venue",    label: "Venue",      emoji: "🏛️" },
+  { key: "music",    label: "Music",      emoji: "🎵" },
+  { key: "catering", label: "Catering",   emoji: "🍽️" },
+  { key: "decor",    label: "Décor",      emoji: "🌸" },
+  { key: "photo",    label: "Photo/Video",emoji: "📸" },
+  { key: "other",    label: "Other",      emoji: "✨" },
 ];
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -47,6 +47,15 @@ export default function Tasks() {
       setShowForm(false);
       setForm({ category: "other", completed: false, sortOrder: 99 });
       toast({ title: "Task added ✨", description: "New task added to the checklist" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<InsertTask> }) =>
+      apiRequest("PATCH", `/api/tasks/${id}`, data).then(r => r.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
+      toast({ title: "Task updated ✓" });
     },
   });
 
@@ -151,6 +160,16 @@ export default function Tasks() {
               />
             </div>
             <div style={{ gridColumn:"1/-1" }}>
+              <label style={labelStyle}>Assigned To</label>
+              <input
+                data-testid="input-task-assigned"
+                value={form.assignedTo || ""}
+                onChange={e => setForm(f => ({ ...f, assignedTo: e.target.value }))}
+                placeholder="e.g. Rosario, Aunt Rosa..."
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ gridColumn:"1/-1" }}>
               <label style={labelStyle}>Notes</label>
               <input
                 data-testid="input-task-notes"
@@ -223,6 +242,7 @@ export default function Tasks() {
             <TaskRow key={task.id} task={task}
               onToggle={() => toggleMutation.mutate({ id: task.id, completed: !task.completed })}
               onDelete={() => deleteMutation.mutate(task.id)}
+              onSave={(data) => updateMutation.mutate({ id: task.id, data })}
             />
           ))}
           {sorted.length === 0 && (
@@ -236,10 +256,125 @@ export default function Tasks() {
   );
 }
 
-function TaskRow({ task, onToggle, onDelete }: { task: Task; onToggle: () => void; onDelete: () => void }) {
+function TaskRow({ task, onToggle, onDelete, onSave }: {
+  task: Task;
+  onToggle: () => void;
+  onDelete: () => void;
+  onSave: (data: Partial<InsertTask>) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<Partial<InsertTask>>({});
+
   const CATEGORY_EMOJI: Record<string,string> = {
     attire:"👗", venue:"🏛️", music:"🎵", catering:"🍽️", decor:"🌸", photo:"📸", other:"✨",
   };
+
+  function startEdit() {
+    setDraft({
+      title: task.title,
+      category: task.category,
+      dueDate: task.dueDate ?? "",
+      assignedTo: task.assignedTo ?? "",
+      notes: task.notes ?? "",
+    });
+    setEditing(true);
+  }
+
+  function saveEdit() {
+    onSave(draft);
+    setEditing(false);
+  }
+
+  if (editing) {
+    return (
+      <div
+        data-testid={`row-task-${task.id}`}
+        style={{
+          background:"var(--color-surface)",
+          border:"2px solid hsl(340,55%,62%,0.4)",
+          borderRadius:"var(--radius-lg)",
+          padding:"var(--space-4) var(--space-5)",
+          boxShadow:"var(--shadow-md)",
+        }}
+      >
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-3)" }}>
+          <div style={{ gridColumn:"1/-1" }}>
+            <label style={labelStyle}>Title</label>
+            <input
+              data-testid={`input-edit-title-${task.id}`}
+              value={draft.title || ""}
+              onChange={e => setDraft(d => ({ ...d, title: e.target.value }))}
+              style={inputStyle}
+              autoFocus
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Category</label>
+            <select
+              value={draft.category || "other"}
+              onChange={e => setDraft(d => ({ ...d, category: e.target.value }))}
+              style={inputStyle}
+            >
+              {["attire","venue","music","catering","decor","photo","other"].map(k => (
+                <option key={k} value={k}>{CATEGORY_EMOJI[k]} {k.charAt(0).toUpperCase()+k.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label style={labelStyle}>Due Date</label>
+            <input
+              type="date"
+              value={draft.dueDate || ""}
+              onChange={e => setDraft(d => ({ ...d, dueDate: e.target.value }))}
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Assigned To</label>
+            <input
+              value={draft.assignedTo || ""}
+              onChange={e => setDraft(d => ({ ...d, assignedTo: e.target.value }))}
+              placeholder="Name..."
+              style={inputStyle}
+            />
+          </div>
+          <div>
+            <label style={labelStyle}>Notes</label>
+            <input
+              value={draft.notes || ""}
+              onChange={e => setDraft(d => ({ ...d, notes: e.target.value }))}
+              placeholder="Notes..."
+              style={inputStyle}
+            />
+          </div>
+        </div>
+        <div style={{ display:"flex", gap:"var(--space-2)", marginTop:"var(--space-3)" }}>
+          <button
+            data-testid={`button-save-task-${task.id}`}
+            onClick={saveEdit}
+            style={{
+              display:"flex", alignItems:"center", gap:6,
+              padding:"var(--space-2) var(--space-4)", borderRadius:"var(--radius-md)",
+              background:"var(--color-primary)", color:"white", fontWeight:600, fontSize:"var(--text-xs)",
+            }}
+          >
+            <Check size={14}/> Save
+          </button>
+          <button
+            onClick={() => setEditing(false)}
+            style={{
+              display:"flex", alignItems:"center", gap:6,
+              padding:"var(--space-2) var(--space-4)", borderRadius:"var(--radius-md)",
+              background:"var(--color-surface-offset)", color:"var(--color-text-muted)",
+              fontWeight:600, fontSize:"var(--text-xs)", border:"1px solid var(--color-border)",
+            }}
+          >
+            <X size={14}/> Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -288,6 +423,15 @@ function TaskRow({ task, onToggle, onDelete }: { task: Task; onToggle: () => voi
       )}
 
       <button
+        data-testid={`button-edit-task-${task.id}`}
+        onClick={startEdit}
+        style={{ flexShrink:0, color:"var(--color-text-faint)", opacity:0.6, padding:4 }}
+        title="Edit task"
+      >
+        <Pencil size={15}/>
+      </button>
+
+      <button
         data-testid={`button-delete-task-${task.id}`}
         onClick={onDelete}
         style={{ flexShrink:0, color:"var(--color-text-faint)", opacity:0.5 }}
@@ -305,5 +449,5 @@ const labelStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
   border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
-  fontSize:"var(--text-sm)",
+  fontSize:"var(--text-sm)", color:"var(--color-text)",
 };
