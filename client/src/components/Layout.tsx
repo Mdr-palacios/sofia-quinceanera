@@ -5,8 +5,8 @@ import { Sun, Moon, LayoutDashboard, CheckSquare, Users, DollarSign } from "luci
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/tasks", label: "Checklist", icon: CheckSquare },
-  { href: "/godparents", label: "Padrinos", icon: Users },
-  { href: "/budget", label: "Presupuesto", icon: DollarSign },
+  { href: "/godparents", label: "Godparents", icon: Users },
+  { href: "/budget", label: "Budget", icon: DollarSign },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -44,7 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 Sofía
               </div>
               <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-muted)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                XV Años · 26 Dic
+                XV · Dec 26
               </div>
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           }}
         >
           {theme === "dark" ? <Sun size={14}/> : <Moon size={14}/>}
-          {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          {theme === "dark" ? "Light mode" : "Dark mode"}
         </button>
       </aside>
 
@@ -135,8 +135,8 @@ function CountdownBadge() {
       <div style={{ fontSize: "var(--text-xl)", fontFamily: "var(--font-display)", fontWeight: 900, lineHeight: 1 }}>
         {days}
       </div>
-      <div style={{ fontSize: "var(--text-xs)", opacity: 0.9, marginTop: 2 }}>días restantes</div>
-      <div style={{ fontSize: "var(--text-xs)", opacity: 0.75, marginTop: 2 }}>🎉 26 Dic 2026</div>
+      <div style={{ fontSize: "var(--text-xs)", opacity: 0.9, marginTop: 2 }}>days to go</div>
+      <div style={{ fontSize: "var(--text-xs)", opacity: 0.75, marginTop: 2 }}>🎉 Dec 26, 2026</div>
     </div>
   );
 }

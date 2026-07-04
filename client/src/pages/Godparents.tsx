@@ -6,16 +6,16 @@ import { Plus, Trash2, Users, Heart, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ROLE_OPTIONS = [
-  "Padrinos de Vestido",
-  "Padrinos de Salón",
-  "Madrina de Pastel",
-  "Padrino de Música",
-  "Padrinos de Foto y Video",
-  "Padrinos de Decoración",
-  "Padrinos de Recuerdos",
-  "Padrinos de Invitaciones",
-  "Padrinos de Catering",
-  "Otro",
+  "Dress Sponsors",
+  "Venue Sponsors",
+  "Cake Sponsors",
+  "Music Sponsors",
+  "Photo & Video Sponsors",
+  "Décor Sponsors",
+  "Keepsake Sponsors",
+  "Invitation Sponsors",
+  "Catering Sponsors",
+  "Other",
 ];
 
 const COLORS = ["#e8a0b0","#f5c842","#c084fc","#60a5fa","#34d399","#f97316","#a78bfa","#fb7185"];
@@ -36,7 +36,7 @@ export default function Godparents() {
       queryClient.invalidateQueries({ queryKey: ["/api/godparents"] });
       setShowForm(false);
       setForm({ color: COLORS[0], pledgeAmount: 0, paidAmount: 0 });
-      toast({ title: "Padrino añadido 💖", description: "El padrino ha sido registrado exitosamente" });
+      toast({ title: "Godparent added 💖", description: "Successfully registered" });
     },
   });
 
@@ -45,7 +45,7 @@ export default function Godparents() {
       apiRequest("PATCH", `/api/godparents/${id}`, data).then(r => r.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/godparents"] });
-      toast({ title: "Actualizado ✓" });
+      toast({ title: "Updated ✓" });
     },
   });
 
@@ -64,10 +64,10 @@ export default function Godparents() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:"var(--space-4)" }}>
         <div>
           <h1 style={{ fontFamily:"var(--font-display)", fontSize:"var(--text-xl)", fontWeight:800, color:"var(--color-text)" }}>
-            Padrinos y Madrinas 💖
+            Godparents 💖
           </h1>
           <p style={{ fontSize:"var(--text-sm)", color:"var(--color-text-muted)", marginTop:"var(--space-1)" }}>
-            Gestiona las contribuciones de la familia y amigos
+            Track contributions from family and friends
           </p>
         </div>
         <button
@@ -79,37 +79,32 @@ export default function Godparents() {
             background:"var(--color-primary)", color:"white", fontWeight:600, fontSize:"var(--text-sm)",
           }}
         >
-          <Plus size={16}/> Añadir padrino
+          <Plus size={16}/> Add godparent
         </button>
       </div>
 
       {/* Summary cards */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))", gap:"var(--space-4)" }}>
-        <SummaryCard icon={<Users size={20} color="hsl(340,55%,62%)"/>} label="Total padrinos" value={String(godparents.length)} />
-        <SummaryCard icon={<Heart size={20} color="hsl(42,80%,55%)"/>} label="Prometido" value={`$${totalPledged.toLocaleString()}`} gold />
-        <SummaryCard icon={<TrendingUp size={20} color="hsl(142,50%,40%)"/>} label="Recibido" value={`$${totalPaid.toLocaleString()}`} green />
-        <SummaryCard icon={<span style={{ fontSize:20 }}>💰</span>} label="Pendiente" value={`$${(totalPledged - totalPaid).toLocaleString()}`} />
+        <SummaryCard icon={<Users size={20} color="hsl(340,55%,62%)"/>} label="Total godparents" value={String(godparents.length)} />
+        <SummaryCard icon={<Heart size={20} color="hsl(42,80%,55%)"/>} label="Total pledged" value={`$${totalPledged.toLocaleString()}`} gold />
+        <SummaryCard icon={<TrendingUp size={20} color="hsl(142,50%,40%)"/>} label="Received" value={`$${totalPaid.toLocaleString()}`} green />
+        <SummaryCard icon={<span style={{ fontSize:20 }}>💰</span>} label="Still pending" value={`$${(totalPledged - totalPaid).toLocaleString()}`} />
       </div>
 
       {/* Progress */}
       <div style={{
-        background:"var(--color-surface)",
-        border:"1px solid var(--color-border)",
-        borderRadius:"var(--radius-xl)",
-        padding:"var(--space-6)",
-        boxShadow:"var(--shadow-sm)",
+        background:"var(--color-surface)", border:"1px solid var(--color-border)",
+        borderRadius:"var(--radius-xl)", padding:"var(--space-6)", boxShadow:"var(--shadow-sm)",
       }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"var(--space-3)" }}>
-          <span style={{ fontSize:"var(--text-sm)", fontWeight:600 }}>Fondos recaudados</span>
+          <span style={{ fontSize:"var(--text-sm)", fontWeight:600 }}>Funds collected</span>
           <span style={{ fontSize:"var(--text-sm)", fontWeight:700, color:"var(--color-primary)" }}>{pct}%</span>
         </div>
         <div style={{ height:14, background:"var(--color-surface-offset)", borderRadius:"var(--radius-full)", overflow:"hidden" }}>
           <div style={{
-            height:"100%",
-            width:`${Math.min(100,pct)}%`,
+            height:"100%", width:`${Math.min(100,pct)}%`,
             background:"linear-gradient(90deg, hsl(340,55%,62%), hsl(42,80%,62%))",
-            borderRadius:"var(--radius-full)",
-            transition:"width 0.8s cubic-bezier(0.34,1.56,0.64,1)",
+            borderRadius:"var(--radius-full)", transition:"width 0.8s cubic-bezier(0.34,1.56,0.64,1)",
           }}/>
         </div>
         <div style={{ display:"flex", justifyContent:"space-between", marginTop:"var(--space-2)" }}>
@@ -121,47 +116,44 @@ export default function Godparents() {
       {/* Add form */}
       {showForm && (
         <div style={{
-          background:"var(--color-surface)",
-          border:"2px solid hsl(340,55%,62%,0.3)",
-          borderRadius:"var(--radius-xl)",
-          padding:"var(--space-6)",
-          boxShadow:"var(--shadow-md)",
+          background:"var(--color-surface)", border:"2px solid hsl(340,55%,62%,0.3)",
+          borderRadius:"var(--radius-xl)", padding:"var(--space-6)", boxShadow:"var(--shadow-md)",
         }}>
           <h3 style={{ fontFamily:"var(--font-display)", fontSize:"var(--text-lg)", fontWeight:700, marginBottom:"var(--space-4)", color:"var(--color-primary)" }}>
-            Nuevo padrino / madrina
+            New Godparent
           </h3>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-4)" }}>
             <div style={{ gridColumn:"1/-1" }}>
-              <label style={labelStyle}>Nombre *</label>
+              <label style={labelStyle}>Name *</label>
               <input data-testid="input-godparent-name" value={form.name||""} onChange={e=>setForm(f=>({...f,name:e.target.value}))}
-                placeholder="ej. Tía Rosa y Tío Carlos" style={inputStyle}/>
+                placeholder="e.g. Aunt Rosa & Uncle Carlos" style={inputStyle}/>
             </div>
             <div style={{ gridColumn:"1/-1" }}>
-              <label style={labelStyle}>Rol / Padrinazgo</label>
+              <label style={labelStyle}>Sponsorship Role</label>
               <select data-testid="select-godparent-role" value={form.role||""} onChange={e=>setForm(f=>({...f,role:e.target.value}))} style={inputStyle}>
-                <option value="">Seleccionar rol...</option>
+                <option value="">Select a role...</option>
                 {ROLE_OPTIONS.map(r=><option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div>
-              <label style={labelStyle}>Monto prometido ($)</label>
+              <label style={labelStyle}>Amount Pledged ($)</label>
               <input data-testid="input-godparent-pledge" type="number" value={form.pledgeAmount||0}
                 onChange={e=>setForm(f=>({...f,pledgeAmount:Number(e.target.value)}))} style={inputStyle}/>
             </div>
             <div>
-              <label style={labelStyle}>Monto recibido ($)</label>
+              <label style={labelStyle}>Amount Received ($)</label>
               <input data-testid="input-godparent-paid" type="number" value={form.paidAmount||0}
                 onChange={e=>setForm(f=>({...f,paidAmount:Number(e.target.value)}))} style={inputStyle}/>
             </div>
             <div>
               <label style={labelStyle}>Email</label>
               <input data-testid="input-godparent-email" type="email" value={form.email||""} onChange={e=>setForm(f=>({...f,email:e.target.value}))}
-                placeholder="email@ejemplo.com" style={inputStyle}/>
+                placeholder="email@example.com" style={inputStyle}/>
             </div>
             <div>
-              <label style={labelStyle}>Teléfono</label>
+              <label style={labelStyle}>Phone</label>
               <input data-testid="input-godparent-phone" value={form.phone||""} onChange={e=>setForm(f=>({...f,phone:e.target.value}))}
-                placeholder="+52 33 ..." style={inputStyle}/>
+                placeholder="+1 ..." style={inputStyle}/>
             </div>
             <div>
               <label style={labelStyle}>Color</label>
@@ -180,10 +172,10 @@ export default function Godparents() {
               if(!form.name||!form.role) return;
               createMutation.mutate(form as InsertGodparent);
             }} style={{ padding:"var(--space-3) var(--space-6)", borderRadius:"var(--radius-md)", background:"var(--color-primary)", color:"white", fontWeight:600, fontSize:"var(--text-sm)" }}>
-              {createMutation.isPending?"Guardando...":"Guardar"}
+              {createMutation.isPending?"Saving...":"Save"}
             </button>
             <button onClick={()=>setShowForm(false)} style={{ padding:"var(--space-3) var(--space-6)", borderRadius:"var(--radius-md)", background:"var(--color-surface-offset)", color:"var(--color-text-muted)", fontWeight:600, fontSize:"var(--text-sm)", border:"1px solid var(--color-border)" }}>
-              Cancelar
+              Cancel
             </button>
           </div>
         </div>
@@ -216,13 +208,9 @@ function GodparentCard({ godparent: g, onDelete, onUpdatePaid }:
 
   return (
     <div data-testid={`card-godparent-${g.id}`} className="card-lift" style={{
-      background:"var(--color-surface)",
-      border:"1px solid var(--color-border)",
-      borderRadius:"var(--radius-xl)",
-      overflow:"hidden",
-      boxShadow:"var(--shadow-sm)",
+      background:"var(--color-surface)", border:"1px solid var(--color-border)",
+      borderRadius:"var(--radius-xl)", overflow:"hidden", boxShadow:"var(--shadow-sm)",
     }}>
-      {/* Color header */}
       <div style={{ height:8, background:g.color }}/>
       <div style={{ padding:"var(--space-5)" }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"var(--space-3)" }}>
@@ -230,29 +218,20 @@ function GodparentCard({ godparent: g, onDelete, onUpdatePaid }:
             <div style={{ fontFamily:"var(--font-display)", fontSize:"var(--text-lg)", fontWeight:700, color:"var(--color-text)", lineHeight:1.2 }}>{g.name}</div>
             <div style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)", marginTop:"var(--space-1)" }}>{g.role}</div>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:4 }}>
-            <div style={{ width:36, height:36, borderRadius:"50%", background:g.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>
-              💝
-            </div>
+          <div style={{ width:36, height:36, borderRadius:"50%", background:g.color, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>
+            💝
           </div>
         </div>
 
-        {/* Amounts */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-3)", marginBottom:"var(--space-4)" }}>
           <div style={{ textAlign:"center", padding:"var(--space-3)", background:"var(--color-surface-offset)", borderRadius:"var(--radius-md)" }}>
-            <div style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)", marginBottom:2 }}>Prometido</div>
+            <div style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)", marginBottom:2 }}>Pledged</div>
             <div style={{ fontFamily:"var(--font-display)", fontWeight:700, color:"var(--color-text)" }}>${g.pledgeAmount.toLocaleString()}</div>
           </div>
-          <div
-            onClick={()=>setEditingPaid(true)}
-            style={{ textAlign:"center", padding:"var(--space-3)", background:"hsl(142,40%,90%)", borderRadius:"var(--radius-md)", cursor:"pointer" }}
-          >
-            <div style={{ fontSize:"var(--text-xs)", color:"hsl(142,30%,35%)", marginBottom:2 }}>Recibido ✏️</div>
+          <div onClick={()=>setEditingPaid(true)} style={{ textAlign:"center", padding:"var(--space-3)", background:"hsl(142,40%,90%)", borderRadius:"var(--radius-md)", cursor:"pointer" }}>
+            <div style={{ fontSize:"var(--text-xs)", color:"hsl(142,30%,35%)", marginBottom:2 }}>Received ✏️</div>
             {editingPaid ? (
-              <input
-                autoFocus
-                type="number"
-                value={paidVal}
+              <input autoFocus type="number" value={paidVal}
                 onChange={e=>setPaidVal(e.target.value)}
                 onBlur={()=>{ onUpdatePaid(Number(paidVal)); setEditingPaid(false); }}
                 onKeyDown={e=>{ if(e.key==="Enter"){ onUpdatePaid(Number(paidVal)); setEditingPaid(false); }}}
@@ -264,24 +243,20 @@ function GodparentCard({ godparent: g, onDelete, onUpdatePaid }:
           </div>
         </div>
 
-        {/* Progress bar */}
         <div style={{ marginBottom:"var(--space-4)" }}>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"var(--space-1)" }}>
-            <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>Progreso</span>
+            <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>Progress</span>
             <span style={{ fontSize:"var(--text-xs)", fontWeight:600, color: pct===100?"hsl(142,50%,40%)" : "var(--color-text-muted)" }}>{pct}%</span>
           </div>
           <div style={{ height:8, background:"var(--color-surface-offset)", borderRadius:"var(--radius-full)", overflow:"hidden" }}>
             <div style={{
-              height:"100%",
-              width:`${pct}%`,
+              height:"100%", width:`${pct}%`,
               background: pct===100 ? "hsl(142,50%,40%)" : g.color,
-              borderRadius:"var(--radius-full)",
-              transition:"width 0.8s ease",
+              borderRadius:"var(--radius-full)", transition:"width 0.8s ease",
             }}/>
           </div>
         </div>
 
-        {/* Footer */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>
             {g.email && <span>✉️ {g.email}</span>}

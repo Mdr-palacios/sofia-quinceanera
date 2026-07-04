@@ -2,25 +2,25 @@ import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import type { Task, InsertTask } from "@shared/schema";
-import { CheckCircle2, Circle, Plus, Trash2, Filter } from "lucide-react";
+import { CheckCircle2, Circle, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const CATEGORIES = [
-  { key: "all", label: "Todas", emoji: "🌸" },
-  { key: "attire", label: "Vestimenta", emoji: "👗" },
-  { key: "venue", label: "Salón", emoji: "🏛️" },
-  { key: "music", label: "Música", emoji: "🎵" },
+  { key: "all", label: "All", emoji: "🌸" },
+  { key: "attire", label: "Attire", emoji: "👗" },
+  { key: "venue", label: "Venue", emoji: "🏛️" },
+  { key: "music", label: "Music", emoji: "🎵" },
   { key: "catering", label: "Catering", emoji: "🍽️" },
-  { key: "decor", label: "Decoración", emoji: "🌸" },
-  { key: "photo", label: "Foto/Video", emoji: "📸" },
-  { key: "other", label: "Otros", emoji: "✨" },
+  { key: "decor", label: "Décor", emoji: "🌸" },
+  { key: "photo", label: "Photo/Video", emoji: "📸" },
+  { key: "other", label: "Other", emoji: "✨" },
 ];
 
-const MONTHS = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function formatDate(d: string) {
   const dt = new Date(d + "T12:00:00");
-  return `${dt.getDate()} ${MONTHS[dt.getMonth()]}`;
+  return `${MONTHS[dt.getMonth()]} ${dt.getDate()}`;
 }
 
 export default function Tasks() {
@@ -46,7 +46,7 @@ export default function Tasks() {
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
       setShowForm(false);
       setForm({ category: "other", completed: false, sortOrder: 99 });
-      toast({ title: "Tarea creada ✨", description: "Nueva tarea añadida al checklist" });
+      toast({ title: "Task added ✨", description: "New task added to the checklist" });
     },
   });
 
@@ -71,10 +71,10 @@ export default function Tasks() {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:"var(--space-4)" }}>
         <div>
           <h1 style={{ fontFamily:"var(--font-display)", fontSize:"var(--text-xl)", fontWeight:800, color:"var(--color-text)" }}>
-            Checklist de Planning 📋
+            Planning Checklist 📋
           </h1>
           <p style={{ fontSize:"var(--text-sm)", color:"var(--color-text-muted)", marginTop:"var(--space-1)" }}>
-            {done} de {total} tareas completadas · {pct}% listo
+            {done} of {total} tasks complete · {pct}% done
           </p>
         </div>
         <button
@@ -89,7 +89,7 @@ export default function Tasks() {
             boxShadow:"var(--shadow-sm)",
           }}
         >
-          <Plus size={16}/> Nueva tarea
+          <Plus size={16}/> Add task
         </button>
       </div>
 
@@ -114,38 +114,26 @@ export default function Tasks() {
           boxShadow:"var(--shadow-md)",
         }}>
           <h3 style={{ fontFamily:"var(--font-display)", fontSize:"var(--text-lg)", fontWeight:700, marginBottom:"var(--space-4)", color:"var(--color-primary)" }}>
-            Nueva tarea
+            New Task
           </h3>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"var(--space-4)" }}>
             <div style={{ gridColumn:"1/-1" }}>
-              <label style={{ display:"block", fontSize:"var(--text-xs)", fontWeight:600, marginBottom:"var(--space-1)", color:"var(--color-text-muted)", textTransform:"uppercase" }}>
-                Título *
-              </label>
+              <label style={labelStyle}>Title *</label>
               <input
                 data-testid="input-task-title"
                 value={form.title || ""}
                 onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-                placeholder="ej. Reservar el salón..."
-                style={{
-                  width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
-                  border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
-                  fontSize:"var(--text-sm)",
-                }}
+                placeholder="e.g. Book the venue..."
+                style={inputStyle}
               />
             </div>
             <div>
-              <label style={{ display:"block", fontSize:"var(--text-xs)", fontWeight:600, marginBottom:"var(--space-1)", color:"var(--color-text-muted)", textTransform:"uppercase" }}>
-                Categoría
-              </label>
+              <label style={labelStyle}>Category</label>
               <select
                 data-testid="select-task-category"
                 value={form.category || "other"}
                 onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                style={{
-                  width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
-                  border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
-                  fontSize:"var(--text-sm)",
-                }}
+                style={inputStyle}
               >
                 {CATEGORIES.filter(c => c.key !== "all").map(c => (
                   <option key={c.key} value={c.key}>{c.emoji} {c.label}</option>
@@ -153,61 +141,39 @@ export default function Tasks() {
               </select>
             </div>
             <div>
-              <label style={{ display:"block", fontSize:"var(--text-xs)", fontWeight:600, marginBottom:"var(--space-1)", color:"var(--color-text-muted)", textTransform:"uppercase" }}>
-                Fecha límite
-              </label>
+              <label style={labelStyle}>Due Date</label>
               <input
                 data-testid="input-task-duedate"
                 type="date"
                 value={form.dueDate || ""}
                 onChange={e => setForm(f => ({ ...f, dueDate: e.target.value }))}
-                style={{
-                  width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
-                  border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
-                  fontSize:"var(--text-sm)",
-                }}
+                style={inputStyle}
               />
             </div>
             <div style={{ gridColumn:"1/-1" }}>
-              <label style={{ display:"block", fontSize:"var(--text-xs)", fontWeight:600, marginBottom:"var(--space-1)", color:"var(--color-text-muted)", textTransform:"uppercase" }}>
-                Notas
-              </label>
+              <label style={labelStyle}>Notes</label>
               <input
                 data-testid="input-task-notes"
                 value={form.notes || ""}
                 onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                placeholder="Notas adicionales..."
-                style={{
-                  width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
-                  border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
-                  fontSize:"var(--text-sm)",
-                }}
+                placeholder="Additional notes..."
+                style={inputStyle}
               />
             </div>
           </div>
           <div style={{ display:"flex", gap:"var(--space-3)", marginTop:"var(--space-5)" }}>
             <button
               data-testid="button-submit-task"
-              onClick={() => {
-                if (!form.title) return;
-                createMutation.mutate(form as InsertTask);
-              }}
-              style={{
-                padding:"var(--space-3) var(--space-6)", borderRadius:"var(--radius-md)",
-                background:"var(--color-primary)", color:"white", fontWeight:600, fontSize:"var(--text-sm)",
-              }}
+              onClick={() => { if (!form.title) return; createMutation.mutate(form as InsertTask); }}
+              style={{ padding:"var(--space-3) var(--space-6)", borderRadius:"var(--radius-md)", background:"var(--color-primary)", color:"white", fontWeight:600, fontSize:"var(--text-sm)" }}
             >
-              {createMutation.isPending ? "Guardando..." : "Guardar tarea"}
+              {createMutation.isPending ? "Saving..." : "Save task"}
             </button>
             <button
               onClick={() => setShowForm(false)}
-              style={{
-                padding:"var(--space-3) var(--space-6)", borderRadius:"var(--radius-md)",
-                background:"var(--color-surface-offset)", color:"var(--color-text-muted)", fontWeight:600, fontSize:"var(--text-sm)",
-                border:"1px solid var(--color-border)",
-              }}
+              style={{ padding:"var(--space-3) var(--space-6)", borderRadius:"var(--radius-md)", background:"var(--color-surface-offset)", color:"var(--color-text-muted)", fontWeight:600, fontSize:"var(--text-sm)", border:"1px solid var(--color-border)" }}
             >
-              Cancelar
+              Cancel
             </button>
           </div>
         </div>
@@ -248,7 +214,7 @@ export default function Tasks() {
       {isLoading ? (
         <div style={{ display:"flex", flexDirection:"column", gap:"var(--space-3)" }}>
           {[1,2,3].map(i => (
-            <div key={i} style={{ height:72, background:"var(--color-surface-offset)", borderRadius:"var(--radius-lg)", animation:"pulse 1.5s ease infinite" }}/>
+            <div key={i} style={{ height:72, background:"var(--color-surface-offset)", borderRadius:"var(--radius-lg)" }}/>
           ))}
         </div>
       ) : (
@@ -261,7 +227,7 @@ export default function Tasks() {
           ))}
           {sorted.length === 0 && (
             <div style={{ textAlign:"center", padding:"var(--space-12)", color:"var(--color-text-muted)", fontSize:"var(--text-sm)" }}>
-              No hay tareas en esta categoría
+              No tasks in this category
             </div>
           )}
         </div>
@@ -294,10 +260,7 @@ function TaskRow({ task, onToggle, onDelete }: { task: Task; onToggle: () => voi
         onClick={onToggle}
         style={{ flexShrink:0, color: task.completed ? "hsl(142,50%,40%)" : "var(--color-text-faint)" }}
       >
-        {task.completed
-          ? <CheckCircle2 size={24}/>
-          : <Circle size={24}/>
-        }
+        {task.completed ? <CheckCircle2 size={24}/> : <Circle size={24}/>}
       </button>
 
       <span style={{ fontSize:20, flexShrink:0 }}>{CATEGORY_EMOJI[task.category] || "✨"}</span>
@@ -312,32 +275,15 @@ function TaskRow({ task, onToggle, onDelete }: { task: Task; onToggle: () => voi
           {task.title}
         </div>
         <div style={{ display:"flex", gap:"var(--space-3)", marginTop:"var(--space-1)", flexWrap:"wrap" }}>
-          {task.dueDate && (
-            <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>
-              📅 {formatDate(task.dueDate)}
-            </span>
-          )}
-          {task.assignedTo && (
-            <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>
-              👤 {task.assignedTo}
-            </span>
-          )}
-          {task.notes && (
-            <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)", overflow:"hidden", textOverflow:"ellipsis", maxWidth:200 }}>
-              💬 {task.notes}
-            </span>
-          )}
+          {task.dueDate && <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>📅 {formatDate(task.dueDate)}</span>}
+          {task.assignedTo && <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)" }}>👤 {task.assignedTo}</span>}
+          {task.notes && <span style={{ fontSize:"var(--text-xs)", color:"var(--color-text-muted)", overflow:"hidden", textOverflow:"ellipsis", maxWidth:200 }}>💬 {task.notes}</span>}
         </div>
       </div>
 
       {task.completed && (
-        <span style={{
-          fontSize:"var(--text-xs)", fontWeight:600, padding:"2px 10px",
-          borderRadius:"var(--radius-full)",
-          background:"hsl(142,40%,90%)", color:"hsl(142,30%,30%)",
-          flexShrink:0,
-        }}>
-          Listo ✓
+        <span style={{ fontSize:"var(--text-xs)", fontWeight:600, padding:"2px 10px", borderRadius:"var(--radius-full)", background:"hsl(142,40%,90%)", color:"hsl(142,30%,30%)", flexShrink:0 }}>
+          Done ✓
         </span>
       )}
 
@@ -351,3 +297,13 @@ function TaskRow({ task, onToggle, onDelete }: { task: Task; onToggle: () => voi
     </div>
   );
 }
+
+const labelStyle: React.CSSProperties = {
+  display:"block", fontSize:"var(--text-xs)", fontWeight:600, marginBottom:"var(--space-1)",
+  color:"var(--color-text-muted)", textTransform:"uppercase" as const, letterSpacing:"0.05em",
+};
+const inputStyle: React.CSSProperties = {
+  width:"100%", padding:"var(--space-3)", borderRadius:"var(--radius-md)",
+  border:"1px solid var(--color-border)", background:"var(--color-surface-offset)",
+  fontSize:"var(--text-sm)",
+};

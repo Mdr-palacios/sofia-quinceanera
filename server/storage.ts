@@ -46,21 +46,21 @@ sqlite.exec(`
 const taskCount = db.select().from(tasks).all().length;
 if (taskCount === 0) {
   const defaultTasks: InsertTask[] = [
-    { title: "Comprar el vestido", category: "attire", dueDate: "2026-07-01", completed: true, assignedTo: "Familia", notes: "Vestido rosa claro — ¡ya listo!", sortOrder: 1 },
-    { title: "Reservar el salón de eventos", category: "venue", dueDate: "2026-08-15", completed: false, assignedTo: null, notes: null, sortOrder: 2 },
-    { title: "Contratar DJ / Banda", category: "music", dueDate: "2026-09-01", completed: false, assignedTo: null, notes: null, sortOrder: 3 },
-    { title: "Elegir menú con el catering", category: "catering", dueDate: "2026-09-15", completed: false, assignedTo: null, notes: null, sortOrder: 4 },
-    { title: "Invitaciones impresas", category: "other", dueDate: "2026-10-01", completed: false, assignedTo: null, notes: null, sortOrder: 5 },
-    { title: "Contratar fotógrafo / videógrafo", category: "photo", dueDate: "2026-09-01", completed: false, assignedTo: null, notes: null, sortOrder: 6 },
-    { title: "Decoración del salón", category: "decor", dueDate: "2026-11-01", completed: false, assignedTo: null, notes: null, sortOrder: 7 },
-    { title: "Ensayo de vals y coreografía", category: "other", dueDate: "2026-11-15", completed: false, assignedTo: null, notes: null, sortOrder: 8 },
-    { title: "Arreglo floral y bouquet", category: "decor", dueDate: "2026-11-01", completed: false, assignedTo: null, notes: null, sortOrder: 9 },
-    { title: "Maquillaje y peinado", category: "attire", dueDate: "2026-12-01", completed: false, assignedTo: null, notes: null, sortOrder: 10 },
-    { title: "Pastel de quinceañera", category: "catering", dueDate: "2026-12-10", completed: false, assignedTo: null, notes: null, sortOrder: 11 },
-    { title: "Cotización de limousina / transporte", category: "venue", dueDate: "2026-10-15", completed: false, assignedTo: null, notes: null, sortOrder: 12 },
-    { title: "Lista de invitados final", category: "other", dueDate: "2026-11-01", completed: false, assignedTo: null, notes: null, sortOrder: 13 },
-    { title: "Accesorios y tiara", category: "attire", dueDate: "2026-11-15", completed: false, assignedTo: null, notes: null, sortOrder: 14 },
-    { title: "Misa religiosa — confirmar fecha", category: "other", dueDate: "2026-08-01", completed: false, assignedTo: null, notes: null, sortOrder: 15 },
+    { title: "Buy the dress", category: "attire", dueDate: "2026-07-01", completed: true, assignedTo: "Family", notes: "Light pink dress — already done!", sortOrder: 1 },
+    { title: "Book the event venue", category: "venue", dueDate: "2026-08-15", completed: false, assignedTo: null, notes: null, sortOrder: 2 },
+    { title: "Hire DJ / Band", category: "music", dueDate: "2026-09-01", completed: false, assignedTo: null, notes: null, sortOrder: 3 },
+    { title: "Choose catering menu", category: "catering", dueDate: "2026-09-15", completed: false, assignedTo: null, notes: null, sortOrder: 4 },
+    { title: "Print invitations", category: "other", dueDate: "2026-10-01", completed: false, assignedTo: null, notes: null, sortOrder: 5 },
+    { title: "Book photographer / videographer", category: "photo", dueDate: "2026-09-01", completed: false, assignedTo: null, notes: null, sortOrder: 6 },
+    { title: "Venue decoration", category: "decor", dueDate: "2026-11-01", completed: false, assignedTo: null, notes: null, sortOrder: 7 },
+    { title: "Waltz & choreography rehearsal", category: "other", dueDate: "2026-11-15", completed: false, assignedTo: null, notes: null, sortOrder: 8 },
+    { title: "Floral arrangements & bouquet", category: "decor", dueDate: "2026-11-01", completed: false, assignedTo: null, notes: null, sortOrder: 9 },
+    { title: "Hair & makeup", category: "attire", dueDate: "2026-12-01", completed: false, assignedTo: null, notes: null, sortOrder: 10 },
+    { title: "Quinceañera cake", category: "catering", dueDate: "2026-12-10", completed: false, assignedTo: null, notes: null, sortOrder: 11 },
+    { title: "Limo / transportation quote", category: "venue", dueDate: "2026-10-15", completed: false, assignedTo: null, notes: null, sortOrder: 12 },
+    { title: "Finalize guest list", category: "other", dueDate: "2026-11-01", completed: false, assignedTo: null, notes: null, sortOrder: 13 },
+    { title: "Accessories & tiara", category: "attire", dueDate: "2026-11-15", completed: false, assignedTo: null, notes: null, sortOrder: 14 },
+    { title: "Confirm church / ceremony date", category: "other", dueDate: "2026-08-01", completed: false, assignedTo: null, notes: null, sortOrder: 15 },
   ];
   for (const t of defaultTasks) {
     db.insert(tasks).values(t).run();
@@ -70,11 +70,11 @@ if (taskCount === 0) {
 const godparentCount = db.select().from(godparents).all().length;
 if (godparentCount === 0) {
   const defaultGodparents: InsertGodparent[] = [
-    { name: "Tía Rosa & Tío Carlos", role: "Padrinos de Vestido", email: "", phone: "", pledgeAmount: 8000, paidAmount: 8000, color: "#e8a0b0" },
-    { name: "Familia González", role: "Padrinos de Salón", email: "", phone: "", pledgeAmount: 15000, paidAmount: 5000, color: "#f5c842" },
-    { name: "Madrina Lupita", role: "Madrina de Pastel", email: "", phone: "", pledgeAmount: 3500, paidAmount: 0, color: "#c084fc" },
-    { name: "Padrino Roberto", role: "Padrino de Música", email: "", phone: "", pledgeAmount: 6000, paidAmount: 3000, color: "#60a5fa" },
-    { name: "Familia Herrera", role: "Padrinos de Recuerdos", email: "", phone: "", pledgeAmount: 4000, paidAmount: 4000, color: "#34d399" },
+    { name: "Aunt Rosa & Uncle Carlos", role: "Dress Sponsors", email: "", phone: "", pledgeAmount: 8000, paidAmount: 8000, color: "#e8a0b0" },
+    { name: "González Family", role: "Venue Sponsors", email: "", phone: "", pledgeAmount: 15000, paidAmount: 5000, color: "#f5c842" },
+    { name: "Godmother Lupita", role: "Cake Sponsors", email: "", phone: "", pledgeAmount: 3500, paidAmount: 0, color: "#c084fc" },
+    { name: "Godfather Roberto", role: "Music Sponsors", email: "", phone: "", pledgeAmount: 6000, paidAmount: 3000, color: "#60a5fa" },
+    { name: "Herrera Family", role: "Keepsake Sponsors", email: "", phone: "", pledgeAmount: 4000, paidAmount: 4000, color: "#34d399" },
   ];
   for (const g of defaultGodparents) {
     db.insert(godparents).values(g).run();
@@ -84,16 +84,16 @@ if (godparentCount === 0) {
 const budgetCount = db.select().from(budgetItems).all().length;
 if (budgetCount === 0) {
   const defaultBudget: InsertBudgetItem[] = [
-    { category: "attire", description: "Vestido de quinceañera", estimatedCost: 8000, actualCost: 8000, paid: true, godparentId: 1 },
-    { category: "venue", description: "Salón de eventos", estimatedCost: 15000, actualCost: 0, paid: false, godparentId: 2 },
-    { category: "catering", description: "Catering / banquete", estimatedCost: 12000, actualCost: 0, paid: false, godparentId: null },
-    { category: "music", description: "DJ y sistema de sonido", estimatedCost: 6000, actualCost: 0, paid: false, godparentId: 4 },
-    { category: "photo", description: "Fotografía y video", estimatedCost: 7000, actualCost: 0, paid: false, godparentId: null },
-    { category: "decor", description: "Decoración y flores", estimatedCost: 5000, actualCost: 0, paid: false, godparentId: null },
-    { category: "catering", description: "Pastel de quinceañera", estimatedCost: 3500, actualCost: 0, paid: false, godparentId: 3 },
-    { category: "other", description: "Invitaciones", estimatedCost: 2000, actualCost: 0, paid: false, godparentId: null },
-    { category: "attire", description: "Accesorios y tiara", estimatedCost: 2500, actualCost: 0, paid: false, godparentId: null },
-    { category: "other", description: "Recuerdos / souvenirs", estimatedCost: 4000, actualCost: 4000, paid: true, godparentId: 5 },
+    { category: "attire",   description: "Quinceañera dress",        estimatedCost: 8000,  actualCost: 8000, paid: true,  godparentId: 1 },
+    { category: "venue",    description: "Event venue",              estimatedCost: 15000, actualCost: 0,    paid: false, godparentId: 2 },
+    { category: "catering", description: "Catering / banquet",       estimatedCost: 12000, actualCost: 0,    paid: false, godparentId: null },
+    { category: "music",    description: "DJ & sound system",        estimatedCost: 6000,  actualCost: 0,    paid: false, godparentId: 4 },
+    { category: "photo",    description: "Photography & video",       estimatedCost: 7000,  actualCost: 0,    paid: false, godparentId: null },
+    { category: "decor",    description: "Decoration & flowers",     estimatedCost: 5000,  actualCost: 0,    paid: false, godparentId: null },
+    { category: "catering", description: "Quinceañera cake",         estimatedCost: 3500,  actualCost: 0,    paid: false, godparentId: 3 },
+    { category: "other",    description: "Invitations",              estimatedCost: 2000,  actualCost: 0,    paid: false, godparentId: null },
+    { category: "attire",   description: "Accessories & tiara",      estimatedCost: 2500,  actualCost: 0,    paid: false, godparentId: null },
+    { category: "other",    description: "Keepsakes / party favors", estimatedCost: 4000,  actualCost: 4000, paid: true,  godparentId: 5 },
   ];
   for (const b of defaultBudget) {
     db.insert(budgetItems).values(b).run();
@@ -102,19 +102,16 @@ if (budgetCount === 0) {
 
 // ── Storage Interface ──────────────────────────────────────────────────────
 export interface IStorage {
-  // Tasks
   getTasks(): Task[];
   createTask(task: InsertTask): Task;
   updateTask(id: number, data: Partial<InsertTask>): Task | undefined;
   deleteTask(id: number): void;
 
-  // Godparents
   getGodparents(): Godparent[];
   createGodparent(g: InsertGodparent): Godparent;
   updateGodparent(id: number, data: Partial<InsertGodparent>): Godparent | undefined;
   deleteGodparent(id: number): void;
 
-  // Budget
   getBudgetItems(): BudgetItem[];
   createBudgetItem(item: InsertBudgetItem): BudgetItem;
   updateBudgetItem(id: number, data: Partial<InsertBudgetItem>): BudgetItem | undefined;
